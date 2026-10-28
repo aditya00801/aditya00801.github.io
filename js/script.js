@@ -1,140 +1,147 @@
-/* ==========================================================================
-   Projects Data Array
-   ========================================================================== */
-// Add new projects by creating a new object in this array
 const projects = [
     {
-        title: "Student Lifestyle and Stress Prediction",
-        description: "An end-to-end Machine Learning web app predicting student health conditions across 3 categories. Trained on 690,088 records using an optimized CatBoost classifier and 20 engineered features, achieving a 94.985% balanced accuracy.",
+        title: "Student Lifestyle & Stress Prediction",
+        description: "An end-to-end machine learning app predicting student health conditions across three categories. Trained on 690,088 records with an optimized CatBoost model and 20 engineered features, reaching 94.985% balanced accuracy.",
         tags: ["Machine Learning", "CatBoost", "Streamlit", "Optuna"],
         codeLink: "https://github.com/aditya00801/Student_Lifestyle_and_Stress_Prediction",
         liveLink: "https://studentlifestyleandstressprediction-eyme6xuza6uzbh72mqn6rj.streamlit.app/"
     },
     {
-        title: "CyberShield-Auto (Ongoing)",
-        description: "🚧 [Currently in Development] An AI-driven cybersecurity platform for autonomous threat detection and response. Utilizes machine learning, multi-agent architecture, and security event analysis to identify suspicious activity, assess severity, and initiate actions automatically.",
-        tags: ["AI Agents", "Machine Learning", "FastAPI", "Pydantic", "Cybersecurity", "Streamlit"],
+        title: "CyberShield-Auto",
+        description: "An AI-driven cybersecurity platform in development. It combines machine learning, multi-agent workflows, and security event analysis to identify suspicious activity and assess its severity.",
+        tags: ["AI Agents", "FastAPI", "Pydantic", "Cybersecurity"],
         codeLink: "https://github.com/aditya00801/CyberShield-Auto",
         liveLink: ""
-    },
-    {
-        title: "[NAME]",
-        description: "[DESCRIPTION]",
-        tags: ["[TECH TAGS]", "Placeholder"],
-        codeLink: "[GITHUB LINK]",
-        liveLink: "[LIVE LINK]"
     }
 ];
 
-/* ==========================================================================
-   DOM Elements & Initialization
-   ========================================================================== */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
     initMobileMenu();
     renderProjects();
+    initScrollMotion();
+    initPortraitTilt();
 });
 
-/* ==========================================================================
-   Mobile Menu Functionality
-   ========================================================================== */
 function initMobileMenu() {
-    const menuBtn = document.querySelector('.mobile-menu-btn');
-    const navLinks = document.querySelector('.nav-links');
-    const navItems = document.querySelectorAll('.nav-links a');
+    const menuButton = document.querySelector(".menu-toggle");
+    const menu = document.querySelector("#main-nav");
+    if (!menuButton || !menu) return;
 
-    if (!menuBtn || !navLinks) return;
+    const closeMenu = () => {
+        menuButton.setAttribute("aria-expanded", "false");
+        menuButton.setAttribute("aria-label", "Open navigation");
+        menu.classList.remove("is-open");
+    };
 
-    // Toggle menu
-    menuBtn.addEventListener('click', () => {
-        const isExpanded = menuBtn.getAttribute('aria-expanded') === 'true';
-        menuBtn.setAttribute('aria-expanded', !isExpanded);
-        menuBtn.classList.toggle('active');
-        navLinks.classList.toggle('active');
+    menuButton.addEventListener("click", () => {
+        const willOpen = menuButton.getAttribute("aria-expanded") !== "true";
+        menuButton.setAttribute("aria-expanded", String(willOpen));
+        menuButton.setAttribute("aria-label", willOpen ? "Close navigation" : "Open navigation");
+        menu.classList.toggle("is-open", willOpen);
     });
 
-    // Close menu when a link is clicked
-    navItems.forEach(item => {
-        item.addEventListener('click', () => {
-            menuBtn.setAttribute('aria-expanded', 'false');
-            menuBtn.classList.remove('active');
-            navLinks.classList.remove('active');
+    menu.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            closeMenu();
+            menuButton.focus();
+        }
+    });
+}
+
+function renderProjects() {
+    const grid = document.querySelector("#projects-grid");
+    if (!grid) return;
+
+    projects.forEach((project, index) => {
+        const card = document.createElement("article");
+        card.className = "project-card";
+
+        const topLine = document.createElement("div");
+        topLine.className = "project-topline";
+        const projectNumber = document.createElement("span");
+        projectNumber.textContent = `PROJECT / 0${index + 1}`;
+        const projectStatus = document.createElement("span");
+        projectStatus.textContent = index === 1 ? "IN DEVELOPMENT" : "DEPLOYED";
+        topLine.append(projectNumber, projectStatus);
+
+        const title = document.createElement("h3");
+        title.className = "project-title";
+        title.textContent = project.title;
+
+        const description = document.createElement("p");
+        description.className = "project-desc";
+        description.textContent = project.description;
+
+        const tags = document.createElement("div");
+        tags.className = "project-tags";
+        project.tags.forEach((label) => {
+            const tag = document.createElement("span");
+            tag.className = "tag";
+            tag.textContent = label;
+            tags.append(tag);
+        });
+
+        const links = document.createElement("div");
+        links.className = "project-links";
+        addProjectLink(links, project.codeLink, "Source code");
+        addProjectLink(links, project.liveLink, "Live demo");
+
+        card.append(topLine, title, description, tags, links);
+        grid.append(card);
+    });
+}
+
+function addProjectLink(container, href, label) {
+    if (!href) return;
+    const link = document.createElement("a");
+    link.href = href;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = `${label} ↗`;
+    container.append(link);
+}
+
+function initScrollMotion() {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduceMotion || !("IntersectionObserver" in window)) return;
+
+    const observer = new IntersectionObserver((entries, currentObserver) => {
+        entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("is-visible");
+            currentObserver.unobserve(entry.target);
+        });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+
+    document.querySelectorAll(".reveal-section").forEach((section) => {
+        const items = section.querySelectorAll(".section-heading, .about-copy, .toolkit-item, .project-card, .log-entry, .contact-panel");
+        items.forEach((item, index) => {
+            item.classList.add("reveal-item");
+            item.style.setProperty("--reveal-delay", `${Math.min(index, 5) * 55}ms`);
+            observer.observe(item);
         });
     });
 }
 
-/* ==========================================================================
-   Render Projects
-   ========================================================================== */
-function renderProjects() {
-    const grid = document.getElementById('projects-grid');
-    if (!grid) return;
-    
-    // Clear any existing content (like fallback text) if JS is running
-    grid.innerHTML = '';
+function initPortraitTilt() {
+    const visual = document.querySelector(".hero-visual");
+    if (!visual || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!window.matchMedia("(pointer: fine)").matches) return;
 
-    projects.forEach(project => {
-        // Create card container
-        const card = document.createElement('div');
-        card.className = 'glass-card project-card';
+    const frame = visual.querySelector(".portrait-frame");
+    if (!frame) return;
 
-        // Title
-        const title = document.createElement('h3');
-        title.className = 'project-title';
-        title.textContent = project.title;
+    visual.addEventListener("pointermove", (event) => {
+        const bounds = visual.getBoundingClientRect();
+        const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+        const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+        frame.style.setProperty("--tilt-x", `${-6 + x * 10}deg`);
+        frame.style.setProperty("--tilt-y", `${3 - y * 8}deg`);
+    });
 
-        // Description
-        const desc = document.createElement('p');
-        desc.className = 'project-desc';
-        desc.textContent = project.description;
-
-        // Tags
-        const tagsContainer = document.createElement('div');
-        tagsContainer.className = 'project-tags';
-        project.tags.forEach(tagText => {
-            const tag = document.createElement('span');
-            tag.className = 'tag';
-            tag.textContent = tagText;
-            tagsContainer.appendChild(tag);
-        });
-
-        // Links
-        const linksContainer = document.createElement('div');
-        linksContainer.className = 'project-links';
-
-        if (project.codeLink && project.codeLink.trim() !== '' && project.codeLink !== '[GITHUB LINK]') {
-            const codeA = document.createElement('a');
-            codeA.href = project.codeLink;
-            codeA.target = '_blank';
-            codeA.rel = 'noopener noreferrer';
-            codeA.innerHTML = 'Code &nearr;';
-            linksContainer.appendChild(codeA);
-        } else if (project.codeLink === '[GITHUB LINK]') {
-            const codeA = document.createElement('a');
-            codeA.href = '#';
-            codeA.innerHTML = 'Code &nearr;';
-            linksContainer.appendChild(codeA);
-        }
-
-        if (project.liveLink && project.liveLink.trim() !== '' && project.liveLink !== '[LIVE LINK]') {
-            const liveA = document.createElement('a');
-            liveA.href = project.liveLink;
-            liveA.target = '_blank';
-            liveA.rel = 'noopener noreferrer';
-            liveA.innerHTML = 'Live Demo &nearr;';
-            linksContainer.appendChild(liveA);
-        } else if (project.liveLink === '[LIVE LINK]') {
-            const liveA = document.createElement('a');
-            liveA.href = '#';
-            liveA.innerHTML = 'Live Demo &nearr;';
-            linksContainer.appendChild(liveA);
-        }
-
-        // Assemble card
-        card.appendChild(title);
-        card.appendChild(desc);
-        card.appendChild(tagsContainer);
-        card.appendChild(linksContainer);
-
-        grid.appendChild(card);
+    visual.addEventListener("pointerleave", () => {
+        frame.style.removeProperty("--tilt-x");
+        frame.style.removeProperty("--tilt-y");
     });
 }
