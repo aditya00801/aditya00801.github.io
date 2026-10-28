@@ -1,0 +1,10 @@
+{
+  "name": "Aditya Kushwaha — Portfolio",
+  "short_name": "Aditya K.",
+  "description": "AI, machine learning, and software engineering portfolio of Aditya Kushwaha.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#E8E9DF",
+  "theme_color": "#E8E9DF"
+}

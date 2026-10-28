@@ -4,15 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#f2efe6">
-    <title>Aditya Kushwaha — AI & Software Engineering</title>
-    <meta name="description" content="Aditya Kushwaha is a computer science student building practical projects in AI, machine learning, and software engineering.">
+    <meta name="theme-color" content="#E8E9DF">
+    <title>Aditya Kushwaha | Final-Year AI & Software Engineering Student</title>
+    <meta name="description" content="Meet Aditya Kushwaha, a final-year computer science student in Lucknow building practical projects in AI, machine learning, and software engineering.">
+    <link rel="canonical" href="https://aditya00801.github.io/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Aditya Kushwaha | AI & Software Engineering Portfolio">
+    <meta property="og:description" content="Projects and experience in AI, machine learning, and software engineering by Aditya Kushwaha.">
+    <meta property="og:url" content="https://aditya00801.github.io/">
+    <meta name="twitter:card" content="summary">
+    <link rel="manifest" href="site.webmanifest">
     <link rel="stylesheet" href="css/style.css">
     <script src="js/script.js" defer></script>
 </head>
 
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
+    <div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-value"></span></div>
 
     <header class="site-header">
         <div class="topline" aria-label="Portfolio status">
@@ -29,10 +37,20 @@
                 <a href="#skills">Toolkit</a>
                 <a href="#projects">Projects</a>
                 <a href="#experience">Logbook</a>
+                <a href="#faq">FAQ</a>
+                <button class="search-trigger" id="search-open" type="button">Search <span aria-hidden="true">⌕</span></button>
                 <a class="nav-contact" href="#contact">Get in touch <span aria-hidden="true">↗</span></a>
             </div>
         </nav>
     </header>
+
+    <dialog class="search-dialog" id="site-search" aria-labelledby="search-title">
+        <div class="dialog-topline"><h2 id="search-title">Search this site</h2><button class="dialog-close" type="button" data-close-dialog aria-label="Close search">×</button></div>
+        <label class="visually-hidden" for="site-search-input">Search portfolio content</label>
+        <input id="site-search-input" type="search" placeholder="Try “projects” or “AI”" autocomplete="off">
+        <p class="search-hint">Search sections, skills, and project names.</p>
+        <ul id="search-results" class="search-results" aria-live="polite"></ul>
+    </dialog>
 
     <main id="main">
         <section class="hero section-wrap" id="home" aria-labelledby="hero-title">
@@ -116,13 +134,34 @@
             </ol>
         </section>
 
+        <section class="faq section-wrap section-rule reveal-section" id="faq" aria-labelledby="faq-title">
+            <div class="section-heading section-heading-row">
+                <div><p class="eyebrow">05 / QUICK ANSWERS</p><h2 id="faq-title">A few things<br>you might wonder.</h2></div>
+                <p class="section-note">Still curious? <a href="#contact">Get in touch ↗</a></p>
+            </div>
+            <div class="faq-list">
+                <details class="faq-item"><summary>Are you open to internships?</summary><p>Yes. I’m looking for internship and early-career opportunities in AI and software engineering.</p></details>
+                <details class="faq-item"><summary>What are you building right now?</summary><p>CyberShield-Auto, an AI-driven cybersecurity project that combines machine learning, multi-agent workflows, and security event analysis.</p></details>
+                <details class="faq-item"><summary>Where can I see your work?</summary><p>Browse the selected projects above or visit <a href="https://github.com/aditya00801" target="_blank" rel="noopener noreferrer">my GitHub profile</a>.</p></details>
+            </div>
+        </section>
+
         <section class="contact section-wrap reveal-section" id="contact" aria-labelledby="contact-title">
             <div class="contact-panel">
                 <p class="eyebrow">05 / OPEN CHANNEL</p>
                 <h2 id="contact-title">Have a good<br>problem to solve?</h2>
                 <p>I’m open to conversations about AI, software engineering, and internship opportunities.</p>
+                <form class="contact-form" id="contact-form" novalidate>
+                    <div class="form-row">
+                        <label for="contact-name">Your name <input id="contact-name" name="name" autocomplete="name" required></label>
+                        <label for="contact-email">Your email <input id="contact-email" name="email" type="email" autocomplete="email" required></label>
+                    </div>
+                    <label for="contact-message">Message <textarea id="contact-message" name="message" rows="4" required></textarea></label>
+                    <div class="form-submit-row"><button class="button button-light" type="submit">Prepare email <span aria-hidden="true">↗</span></button><button class="copy-email" id="copy-email" type="button" data-email="adityakushwaha.tech27@gmail.com">Copy email address</button></div>
+                    <p class="form-note">This opens your email app with a draft; this website does not send or store your message.</p>
+                    <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+                </form>
                 <div class="contact-actions">
-                    <a class="button button-light" href="mailto:adityakushwaha.tech27@gmail.com">Write me an email <span aria-hidden="true">↗</span></a>
                     <a class="contact-secondary" href="https://www.linkedin.com/in/aditya-kushwaha-08112k05/" target="_blank" rel="noopener noreferrer">LinkedIn <span aria-hidden="true">↗</span></a>
                     <a class="contact-secondary" href="https://github.com/aditya00801" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
                 </div>
@@ -131,8 +170,24 @@
         </section>
     </main>
 
+    <dialog class="confirm-dialog" id="email-confirm" aria-labelledby="email-confirm-title">
+        <h2 id="email-confirm-title">Open your email app?</h2>
+        <p>A draft will be prepared with your name, email address, and message. You can review it before sending.</p>
+        <div class="dialog-actions"><button class="button button-dark" id="email-confirm-yes" type="button">Continue to email app</button><button class="copy-email" type="button" data-close-dialog>Go back</button></div>
+    </dialog>
+
+    <div class="floating-actions" aria-label="Quick actions">
+        <a class="floating-contact" href="#contact" aria-label="Go to contact form">Contact <span aria-hidden="true">↗</span></a>
+        <a class="back-to-top" id="back-to-top" href="#home" aria-label="Back to top">↑</a>
+    </div>
+
+    <aside class="privacy-banner" id="privacy-banner" aria-label="Privacy notice" hidden>
+        <p><strong>Privacy note:</strong> this portfolio does not use tracking cookies. Dismissing this notice is remembered in this browser.</p>
+        <button class="privacy-dismiss" id="privacy-dismiss" type="button">Got it</button>
+    </aside>
+
     <footer class="site-footer section-wrap">
-        <span>© 2026 ADITYA KUSHWAHA</span><span>MADE WITH HTML, CSS & CURIOSITY</span><a href="#home">BACK TO TOP ↑</a>
+        <span>© 2026 ADITYA KUSHWAHA</span><span>MADE WITH HTML, CSS & CURIOSITY</span><span>UPDATED <time datetime="2026-10-29">29 OCT 2026</time></span><a href="#home">BACK TO TOP ↑</a>
     </footer>
 </body>
 

@@ -1,6 +1,6 @@
 # Aditya Kushwaha - Personal Portfolio
 
-This is the source code for my personal portfolio website, built with plain HTML, CSS, and JavaScript. It features a retro digital field-notes visual style, a CSS 3D portrait scene, lightweight motion, responsive navigation, a project list, and a learning log. Motion respects the visitor's reduced-motion setting.
+This is the source code for my personal portfolio website, built with plain HTML, CSS, and JavaScript. It features a retro digital field-notes visual style, a CSS 3D portrait scene, lightweight motion, responsive navigation, site search, project details, an expandable FAQ, and a learning log. The contact form prepares a draft in the visitor’s email app; it does not send or store messages. Motion respects reduced-motion settings. Search metadata, a canonical URL, `sitemap.xml`, `robots.txt`, and a web app manifest are included.
 
 **Live Site:** [https://aditya00801.github.io/](https://aditya00801.github.io/)
 
@@ -11,7 +11,10 @@ This is the source code for my personal portfolio website, built with plain HTML
 ├── css/
 │   └── style.css    # All CSS styles and variables
 ├── js/
-│   └── script.js    # Logic for mobile menu and project rendering
+│   └── script.js    # Navigation, search, contact form, and motion behavior
+├── robots.txt       # Search crawler access rules
+├── sitemap.xml      # Public page index for search engines
+├── site.webmanifest # Progressive web app metadata
 ├── images/          # Image assets directory
 └── README.md        # Project documentation
 ```

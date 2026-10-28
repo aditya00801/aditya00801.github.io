@@ -20,6 +20,12 @@ document.addEventListener("DOMContentLoaded", () => {
     renderProjects();
     initScrollMotion();
     initPortraitTilt();
+    initScrollProgress();
+    initSiteSearch();
+    initCopyEmail();
+    initContactForm();
+    initPrivacyNotice();
+    addUtmTracking();
 });
 
 function initMobileMenu() {
@@ -42,7 +48,7 @@ function initMobileMenu() {
 
     menu.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
     document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
+        if (event.key === "Escape" && menu.classList.contains("is-open")) {
             closeMenu();
             menuButton.focus();
         }
@@ -115,7 +121,7 @@ function initScrollMotion() {
     }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
 
     document.querySelectorAll(".reveal-section").forEach((section) => {
-        const items = section.querySelectorAll(".section-heading, .about-copy, .toolkit-item, .project-card, .log-entry, .contact-panel");
+        const items = section.querySelectorAll(".section-heading, .about-copy, .toolkit-item, .project-card, .log-entry, .faq-item, .contact-panel");
         items.forEach((item, index) => {
             item.classList.add("reveal-item");
             item.style.setProperty("--reveal-delay", `${Math.min(index, 5) * 55}ms`);
@@ -145,3 +151,209 @@ function initPortraitTilt() {
         frame.style.removeProperty("--tilt-y");
     });
 }
+
+function initScrollProgress() {
+    const progress = document.querySelector("#scroll-progress-value");
+    const backToTop = document.querySelector("#back-to-top");
+    if (!progress) return;
+
+    let framePending = false;
+    const update = () => {
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const amount = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+        progress.style.transform = `scaleX(${Math.min(1, Math.max(0, amount))})`;
+        backToTop?.classList.toggle("is-visible", window.scrollY > 450);
+        framePending = false;
+    };
+
+    window.addEventListener("scroll", () => {
+        if (framePending) return;
+        framePending = true;
+        window.requestAnimationFrame(update);
+    }, { passive: true });
+    update();
+}
+
+function initSiteSearch() {
+    const dialog = document.querySelector("#site-search");
+    const openButton = document.querySelector("#search-open");
+    const input = document.querySelector("#site-search-input");
+    const results = document.querySelector("#search-results");
+    if (!dialog || !openButton || !input || !results) return;
+
+    const sections = [...document.querySelectorAll("main section[id]")].map((section) => {
+        const heading = section.querySelector("h1, h2");
+        const summary = [...section.querySelectorAll("p, h3, li")]
+            .map((element) => element.textContent.trim())
+            .filter(Boolean)
+            .join(" ")
+            .slice(0, 220);
+        return { id: section.id, title: heading?.textContent.trim() || section.id, summary, text: section.textContent.toLowerCase() };
+    });
+
+    const renderResults = () => {
+        const query = input.value.trim().toLowerCase();
+        results.replaceChildren();
+        if (!query) return;
+        const matches = sections.filter((section) => section.text.includes(query));
+        if (!matches.length) {
+            const empty = document.createElement("li");
+            empty.className = "search-empty";
+            empty.textContent = "No matches. Try a different word.";
+            results.append(empty);
+            return;
+        }
+        matches.forEach((section) => {
+            const item = document.createElement("li");
+            const link = document.createElement("a");
+            link.href = `#${section.id}`;
+            const title = document.createElement("strong");
+            title.textContent = section.title;
+            const summary = document.createElement("span");
+            summary.textContent = section.summary;
+            link.append(title, summary);
+            link.addEventListener("click", () => dialog.close());
+            item.append(link);
+            results.append(item);
+        });
+    };
+
+    openButton.addEventListener("click", () => {
+        dialog.showModal();
+        input.value = "";
+        results.replaceChildren();
+        input.focus();
+    });
+    input.addEventListener("input", renderResults);
+    dialog.addEventListener("click", (event) => {
+        if (event.target === dialog) dialog.close();
+    });
+}
+
+function initCopyEmail() {
+    const button = document.querySelector("#copy-email");
+    const status = document.querySelector("#form-status");
+    if (!button) return;
+
+    button.addEventListener("click", async () => {
+        const email = button.dataset.email;
+        if (!email) return;
+        try {
+            await navigator.clipboard.writeText(email);
+            if (status) {
+                status.dataset.state = "success";
+                status.textContent = "Email address copied.";
+            }
+            button.textContent = "Copied!";
+            window.setTimeout(() => { button.textContent = "Copy email address"; }, 1800);
+        } catch {
+            if (status) {
+                status.dataset.state = "error";
+                status.textContent = `Copy unavailable. Email Aditya at ${email}.`;
+            }
+        }
+    });
+}
+
+function initContactForm() {
+    const form = document.querySelector("#contact-form");
+    const dialog = document.querySelector("#email-confirm");
+    const confirmButton = document.querySelector("#email-confirm-yes");
+    const status = document.querySelector("#form-status");
+    if (!form || !dialog || !confirmButton || !status) return;
+
+    let draft = null;
+    const fields = [...form.querySelectorAll("input, textarea")];
+
+    const setStatus = (state, message) => {
+        status.dataset.state = state;
+        status.textContent = message;
+    };
+
+    fields.forEach((field) => {
+        field.addEventListener("input", () => {
+            field.removeAttribute("aria-invalid");
+            if (field.validity.valid) setStatus("", "");
+        });
+    });
+
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const invalid = fields.filter((field) => !field.validity.valid);
+        fields.forEach((field) => {
+            if (!field.validity.valid) field.setAttribute("aria-invalid", "true");
+            else field.removeAttribute("aria-invalid");
+        });
+        if (invalid.length) {
+            const first = invalid[0];
+            const fieldLabel = first.labels?.[0]?.textContent.trim().toLowerCase() || "required";
+            const message = first.validity.typeMismatch
+                ? "Enter a valid email address."
+                : `Please complete the ${fieldLabel.replace(/^your\s+/, "")} field.`;
+            setStatus("error", message);
+            first.focus();
+            return;
+        }
+
+        const values = new FormData(form);
+        draft = {
+            name: String(values.get("name")).trim(),
+            email: String(values.get("email")).trim(),
+            message: String(values.get("message")).trim()
+        };
+        dialog.showModal();
+    });
+
+    confirmButton.addEventListener("click", () => {
+        if (!draft) return;
+        const subject = encodeURIComponent(`Portfolio message from ${draft.name}`);
+        const body = encodeURIComponent(`${draft.message}\n\nFrom: ${draft.name}\nEmail: ${draft.email}`);
+        const mailto = `mailto:adityakushwaha.tech27@gmail.com?subject=${subject}&body=${body}`;
+        dialog.close();
+        setStatus("success", "Your email app was asked to open with a draft. Review and send it there to complete your message.");
+        window.location.href = mailto;
+    });
+}
+
+function initPrivacyNotice() {
+    const banner = document.querySelector("#privacy-banner");
+    const dismiss = document.querySelector("#privacy-dismiss");
+    if (!banner || !dismiss) return;
+
+    let dismissed = false;
+    try {
+        dismissed = localStorage.getItem("portfolioPrivacyNoticeDismissed") === "true";
+    } catch {
+        // Keep the notice visible when browser storage is unavailable.
+    }
+    if (!dismissed) banner.hidden = false;
+
+    dismiss.addEventListener("click", () => {
+        banner.hidden = true;
+        try {
+            localStorage.setItem("portfolioPrivacyNoticeDismissed", "true");
+        } catch {
+            // Dismissal still applies for this page view.
+        }
+    });
+}
+
+function addUtmTracking() {
+    document.querySelectorAll('a[target="_blank"]').forEach((link) => {
+        try {
+            const url = new URL(link.href);
+            url.searchParams.set("utm_source", "aditya-portfolio");
+            url.searchParams.set("utm_medium", "referral");
+            url.searchParams.set("utm_campaign", "portfolio");
+            link.href = url.toString();
+        } catch {
+            // Leave non-URL links unchanged.
+        }
+    });
+}
+
+document.addEventListener("click", (event) => {
+    const closeButton = event.target.closest("[data-close-dialog]");
+    if (!closeButton) return;
+    closeButton.closest("dialog")?.close();
+});
