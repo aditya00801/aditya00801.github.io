@@ -2,7 +2,7 @@
 
 This is the source code for my personal portfolio website, built with plain HTML, CSS, and JavaScript. It features a retro digital field-notes visual style, a CSS 3D portrait scene, lightweight motion, responsive navigation, a project list, and a learning log. Motion respects the visitor's reduced-motion setting.
 
-**Live Site:** [https://aditya00801.github.io/aditya-kushwaha.github.io/](https://aditya00801.github.io/aditya-kushwaha.github.io/)
+**Live Site:** [https://aditya00801.github.io/](https://aditya00801.github.io/)
 
 ## Folder Structure
 
